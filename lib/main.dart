@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'bloc/calculateBloc.dart';
+
 void main() {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -30,13 +32,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  var bloc = new CalculateBloc();
 
   void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+    setState(() {});
   }
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -54,55 +56,83 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               children: <Widget>[
                 Text("Grupo de Risco",
-                    style: TextStyle(fontSize: 18.0, color: Colors.deepPurple)),
+                    style: TextStyle(fontSize: 18.0, color: Color(0xff07213B))),
                 Padding(padding: EdgeInsets.fromLTRB(15.0, 50.0, 15.0, 0.0)),
-                TextFormField(
-                    style: TextStyle(fontSize: 18.0),
-                    keyboardType: TextInputType.number,
-                    autocorrect: false,
-                    autofocus: false,
-                    textInputAction: TextInputAction.done,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                          borderSide: BorderSide(color: Colors.blue)),
-                      filled: true,
-                      fillColor: Colors.white,
-                      labelText: "Informe sua idade:",
+                Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        TextFormField(
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Please enter some text';
+                              }
+                              return null;
+                            },
+                            style: TextStyle(fontSize: 18.0),
+                            keyboardType: TextInputType.number,
+                            autocorrect: false,
+                            autofocus: false,
+                            controller: bloc.idadeInformada,
+                            textInputAction: TextInputAction.done,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5.0)),
+                                  borderSide: BorderSide(color: Colors.blue)),
+                              filled: true,
+                              fillColor: Colors.white,
+                              labelText: "Informe sua idade:",
+                            )),
+                      ],
                     )),
                 Row(
                   children: <Widget>[
                     Checkbox(
-                      value: false,
-                      onChanged: (bool value) {},
+                      value: bloc.doencaCronica,
+                      onChanged: (bool value) {
+                        setState(() {
+                          bloc.doencaCronica = value;
+                        });
+                      },
                     ),
                     Text(
-                      "Possui Algum tipo de doença?",
+                      "Possui Algum tipo de doença cronica?",
                       textAlign: TextAlign.end,
                     ),
                   ],
                 ),
-                Row(children: <Widget>[
-                  Checkbox(
-                    value: false,
-                    onChanged: (bool value) {},
-                  ),
-                  Text("Possui Algum tipo de doença?"),
-                ]),
                 Container(
                   padding: const EdgeInsets.fromLTRB(0.0, 25.0, 0.0, 0.0),
                   width: double.infinity,
                   height: 70.0,
                   child: RaisedButton(
-                    onPressed: () {},
+                    color: Color(0xff07213B),
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        setState(() {
+                          bloc.calculate();
+                          bloc.clearControls();
+                        });
+                      }
+                    },
                     elevation: 5.0,
-                 shape: RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(18.0),
-                    side: BorderSide(color: Colors.blue)
-                ),
-                    child: Text("Verificar"),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(18.0),
+                        side: BorderSide(color: Colors.white)),
+                    child: Text(
+                      "Calcular Risco",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                )
+                ),
+                Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text(
+                    bloc.result,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ],
             ),
           ),

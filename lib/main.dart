@@ -40,6 +40,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final _formKey = GlobalKey<FormState>();
 
+  void validateAndSave() {
+    final FormState form = _formKey.currentState;
+    if (form.validate()) {
+      print('Form is valid');
+      setState(() {
+        bloc.calculate();
+        bloc.clearControls();
+      });
+    } else {
+      print('Form is invalid');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,12 +76,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Column(
                       children: <Widget>[
                         TextFormField(
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Please enter some text';
-                              }
-                              return null;
-                            },
+                            validator: (value) => value.isEmpty
+                                ? 'Campo não pode ser vazio'
+                                : null,
                             style: TextStyle(fontSize: 18.0),
                             keyboardType: TextInputType.number,
                             autocorrect: false,
@@ -99,6 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Text(
                       "Possui Algum tipo de doença cronica?",
                       textAlign: TextAlign.end,
+                        style: TextStyle(fontSize: 15.0, color: Color(0xff07213B))
                     ),
                   ],
                 ),
@@ -109,12 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: RaisedButton(
                     color: Color(0xff07213B),
                     onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        setState(() {
-                          bloc.calculate();
-                          bloc.clearControls();
-                        });
-                      }
+                      validateAndSave();
                     },
                     elevation: 5.0,
                     shape: RoundedRectangleBorder(
@@ -131,6 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text(
                     bloc.result,
                     textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18.0, color: Colors.red),
                   ),
                 ),
               ],

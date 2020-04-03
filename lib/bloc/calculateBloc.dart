@@ -11,7 +11,7 @@ class CalculateBloc{
 
     if(!doencaCronica){
       if(idade >= 50){
-        return;
+        result = "Atenção, você esta no grupo de risco.\n É preciso ficar em isolamento social.";
       }else{
         result = "Atenção, você não esta no grupo de risco.";
       }
